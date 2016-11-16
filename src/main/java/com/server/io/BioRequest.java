@@ -40,7 +40,7 @@ public class BioRequest extends Request {
         }
         logger.debug(request.toString());
         String uri = parseUri(request.toString());
-        logger.debug("解析后uri" + uri);
+        logger.debug("解析后uri:" + uri);
 
         return uri;
     }

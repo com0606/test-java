@@ -1,10 +1,8 @@
 package com.server.aio;
 
-import com.server.Response;
+import com.server.ByteBufferPool;
+import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -12,24 +10,36 @@ import java.nio.channels.CompletionHandler;
 /**
  * Created by lizhen on 2016-11-15.
  */
-public class WriteHandler extends Response implements CompletionHandler<AsynchronousSocketChannel, AioHttpServer> {
+public class WriteHandler implements CompletionHandler<Integer, AsynchronousSocketChannel> {
 
-    private String uri;
+    private static final Logger logger = Logger.getLogger(WriteHandler.class);
 
     private ByteBuffer buffer;
 
-    @Override
-    public void completed(AsynchronousSocketChannel result, AioHttpServer attachment) {
+    private ByteBufferPool pool;
 
+    public WriteHandler(ByteBuffer buffer, ByteBufferPool pool) {
+        this.buffer = buffer;
+        this.pool = pool;
     }
 
     @Override
-    public void failed(Throwable exc, AioHttpServer attachment) {
-
+    public void completed(Integer result, AsynchronousSocketChannel attachment) {
+        close(attachment);
     }
 
     @Override
-    public void sendStaticResource() {
+    public void failed(Throwable exc, AsynchronousSocketChannel attachment) {
+        close(attachment);
+    }
 
+    private void close(AsynchronousSocketChannel attachment) {
+        try {
+            pool.returnByteBuffer(buffer);
+            //连接关闭
+            attachment.close();
+        } catch (Exception e) {
+            logger.debug(e.getMessage());
+        }
     }
 }

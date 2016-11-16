@@ -20,7 +20,10 @@ public class NioRequest extends Request {
 
     private SocketChannel socketChannel;
 
-    public NioRequest(SocketChannel socketChannel) {
+    private ByteBuffer buffer;
+
+    public NioRequest(ByteBuffer buffer, SocketChannel socketChannel) {
+        this.buffer = buffer;
         this.socketChannel = socketChannel;
     }
 
@@ -29,7 +32,6 @@ public class NioRequest extends Request {
     public String parse() {
         try {
             int count;
-            ByteBuffer buffer = ByteBuffer.allocate(8);
             buffer.clear();
             byte[] request = new byte[0];
             while ((count = socketChannel.read(buffer)) > 0) {
@@ -57,7 +59,7 @@ public class NioRequest extends Request {
         }
         logger.debug(uri);
         uri = parseUri(uri);
-        logger.debug("解析后uri" + uri);
+        logger.debug("解析后uri:" + uri);
         return uri;
     }
 }

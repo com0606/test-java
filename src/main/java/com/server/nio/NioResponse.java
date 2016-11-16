@@ -24,9 +24,12 @@ public class NioResponse extends Response {
 
     private SocketChannel socketChannel;
 
-    public NioResponse(String requestUri, SocketChannel socketChannel) {
+    private ByteBuffer buffer;
+
+    public NioResponse(String requestUri, SocketChannel socketChannel, ByteBuffer buffer) {
         this.requestUri = requestUri;
         this.socketChannel = socketChannel;
+        this.buffer = buffer;
     }
 
     public void sendStaticResource() {
@@ -40,7 +43,7 @@ public class NioResponse extends Response {
             File file = new File(NioHttpServer.WEB_ROOT, requestUri);
             if (!"/".equals(requestUri) && file.exists()) {
                 fis = new FileInputStream(file).getChannel();
-                ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+                buffer.clear();
                 while (fis.read(buffer) != -1) {
                     buffer.flip();
                     socketChannel.write(buffer);
@@ -60,7 +63,7 @@ public class NioResponse extends Response {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.debug(e.getMessage());
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.server.nio;
 
+import com.server.ByteBufferPool;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class NioHttpServer {
     }
 
     private void listen() throws Exception {
+        ByteBufferPool byteBufferPool = new ByteBufferPool(100, 256);
         ServerSocketChannel server = ServerSocketChannel.open();
         Selector selector = Selector.open();
         server.socket().bind(new InetSocketAddress(port));
@@ -61,7 +63,7 @@ public class NioHttpServer {
                     if(key.isReadable()) {
                         key.interestOps(key.interestOps() & (~SelectionKey.OP_READ));
                         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
-                        executorService.execute(new HandlerClient(key));
+                        executorService.execute(new HandlerClient(key, byteBufferPool));
                     }else {
                         key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
                     }
@@ -81,7 +83,7 @@ public class NioHttpServer {
 
     public void start() {
         try {
-            executorService = Executors.newFixedThreadPool(2);
+            executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             listen();
             executorService.shutdown();
         }catch (Exception e) {

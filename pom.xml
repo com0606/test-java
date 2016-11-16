@@ -101,6 +101,12 @@
             <version>5.1.12</version>
         </dependency>
 
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.6</version>
+        </dependency>
+
         <!--<dependency>-->
         <!--<groupId>org.apache.hadoop</groupId>-->
         <!--<artifactId>hadoop-common</artifactId>-->
@@ -183,6 +189,10 @@
                 <exclusion>
                     <artifactId>com.google.protobuf</artifactId>
                     <groupId>protobuf-java</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-pool</artifactId>
+                    <groupId>commons-pool</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
